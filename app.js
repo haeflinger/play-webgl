@@ -1,6 +1,7 @@
 var gl,
     shaderProgram,
-    verticies;
+    verticies,
+    vertextCount = 5000;
 
 initGL();
 createShaders();
@@ -27,11 +28,12 @@ function createShaders() {
 }
 
 function createVerticies() {
-  verticies = [
-    -0.9, -0.9, 0.0,
-     0.9, -0.9, 0.0,
-     0.0,  0.9, 0.0
-    ];
+  verticies = [];
+
+  for(var i = 0; i < vertextCount; i++){
+    verticies.push(Math.random() * 2 - 1);
+    verticies.push(Math.random() * 2 - 1);
+  }
 
   var buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -39,12 +41,12 @@ function createVerticies() {
 
   var coords = gl.getAttribLocation(shaderProgram, "coords");
   //gl.vertexAttrib3f(coords, 0.5, 0.5, 0);
-  gl.vertexAttribPointer(coords, 3, gl.FLOAT, false, 0, 0);
+  gl.vertexAttribPointer(coords, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(coords);
-  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  //gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
   var pointSize = gl.getAttribLocation(shaderProgram, "pointSize");
-  gl.vertexAttrib1f(pointSize, 20);
+  gl.vertexAttrib1f(pointSize, 1);
 
   var color = gl.getUniformLocation(shaderProgram, "color");
   gl.uniform4f(color, 0, 0, 0, 1);
@@ -92,6 +94,12 @@ function getShader(gl, id) {
 
 
 function draw() {
+  for(var i = 0; i < vertextCount * 2; i += 2){
+    verticies[i] += Math.random() * 0.01 - 0.005;
+    verticies[i + 1] += Math.random() * 0.01 - 0.005;
+  }
+  gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(verticies));
   gl.clear(gl.COLOR_BUFFER_BIT);
-  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  gl.drawArrays(gl.POINTS, 0, vertextCount);
+  requestAnimationFrame(draw);
 }
